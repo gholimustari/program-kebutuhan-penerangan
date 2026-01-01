@@ -1,0 +1,2215 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Penerangan Bangunan - Kelompok 6</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --cyan: #1abc9c;
+            --magenta: #9b59b6;
+            --gray: #95a5a6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header h2 {
+            font-size: 1.2rem;
+            font-weight: 300;
+            margin-bottom: 20px;
+        }
+
+        .team-members {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .member {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            transition: transform 0.3s;
+        }
+
+        .member:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            min-height: 800px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: var(--light);
+            border-right: 1px solid #ddd;
+            padding: 20px 0;
+        }
+
+        .menu {
+            list-style: none;
+        }
+
+        /* Menu Item Styles - FIXED */
+        .menu-item {
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+            font-weight: 500;
+            user-select: none;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .menu-item:hover {
+            background: rgba(52, 152, 219, 0.1);
+            border-left-color: var(--secondary);
+            padding-left: 30px;
+        }
+
+        .menu-item.active {
+            background: rgba(52, 152, 219, 0.15);
+            border-left-color: var(--secondary);
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--cyan);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Form Styles */
+        .form-container {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .input-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .input-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #27ae60;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        .btn-danger {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* Card Grid */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        /* Results */
+        .results-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .result-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .result-card.highlight {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-card.highlight .result-title {
+            color: white;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 5px;
+        }
+
+        .result-card.highlight .result-value {
+            color: white;
+        }
+
+        .result-unit {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .result-card.highlight .result-unit {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Tips Section */
+        .tips-container {
+            background: rgba(46, 204, 113, 0.1);
+            border-left: 4px solid var(--success);
+            padding: 20px;
+            border-radius: 0 6px 6px 0;
+            margin-top: 25px;
+        }
+
+        .tips-title {
+            color: var(--success);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tip-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .tip-icon {
+            color: var(--success);
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+
+        /* Room Management */
+        .room-management-container {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .floor-container {
+            background: var(--light);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .floor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .floor-title {
+            font-size: 1.3rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rooms-container {
+            display: grid;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .room-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #eee;
+            transition: all 0.3s;
+        }
+
+        .room-card:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .room-title {
+            font-size: 1.1rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .room-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .room-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .room-detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .room-detail-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 2px;
+        }
+
+        .room-detail-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .close-modal:hover {
+            color: var(--accent);
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--light);
+            z-index: 1;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--gray);
+            margin-bottom: 10px;
+            border: 2px solid var(--light);
+            transition: all 0.3s;
+        }
+
+        .step.active .step-number {
+            background: var(--secondary);
+            border-color: var(--secondary);
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            text-align: center;
+        }
+
+        .step.active .step-label {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        /* Table Styles */
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-table th {
+            background: var(--light);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary);
+            border-bottom: 2px solid #ddd;
+        }
+
+        .result-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-table tr:hover {
+            background: rgba(52, 152, 219, 0.05);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .footer p {
+            margin-bottom: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+            
+            .menu {
+                display: flex;
+                overflow-x: auto;
+                padding: 10px;
+            }
+            
+            .menu-item {
+                white-space: nowrap;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                flex-direction: column;
+                padding: 10px 15px;
+                min-width: 140px;
+                text-align: center;
+            }
+            
+            .menu-item.active {
+                border-left: none;
+                border-bottom-color: var(--secondary);
+            }
+            
+            .menu-item:hover {
+                padding-left: 15px;
+                border-left: none;
+                border-bottom-color: var(--secondary);
+            }
+            
+            .input-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .room-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .floor-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .progress-steps {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+            
+            .progress-steps::before {
+                display: none;
+            }
+        }
+
+        /* Animation for Success */
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .success-pulse {
+            animation: successPulse 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-lightbulb"></i>
+                Kalkulator Penerangan Bangunan
+            </h1>
+            <h2>Menghitung Kebutuhan Penerangan Berdasarkan Standar SNI 03-6577-2001</h2>
+            <div class="team-members">
+                <div class="member">1. Gholi Kukuh Mustari (1501625053)</div>
+                <div class="member">2. Derhans Gading Ardana (1501625072)</div>
+                <div class="member">3. Mochamad Rafly Pratama (1501625104)</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar Menu -->
+            <div class="sidebar">
+                <ul class="menu">
+                    <li>
+                        <button class="menu-item active" data-target="home">
+                            <i class="fas fa-home"></i> Utama
+                        </button>
+                    </li>
+                    <li>
+                        <button class="menu-item" data-target="single-room">
+                            <i class="fas fa-calculator"></i> Hitung Satu Ruangan
+                        </button>
+                    </li>
+                    <li>
+                        <button class="menu-item" data-target="multi-building">
+                            <i class="fas fa-building"></i> Hitung Seluruh Bangunan
+                        </button>
+                    </li>
+                    <li>
+                        <button class="menu-item" data-target="guide">
+                            <i class="fas fa-book"></i> Panduan
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Home Section -->
+                <div class="section active" id="home">
+                    <h2 class="section-title"><i class="fas fa-home"></i> Selamat Datang</h2>
+                    <div class="form-container">
+                        <p style="margin-bottom: 20px; line-height: 1.6;">
+                            Selamat datang di Kalkulator Penerangan Bangunan. Aplikasi ini dikembangkan untuk menghitung kebutuhan penerangan ruangan dan bangunan berdasarkan standar SNI 03-6577-2001. 
+                            Program ini membantu Anda merencanakan sistem pencahayaan yang optimal dengan memperhitungkan berbagai faktor seperti jenis ruangan, dimensi, warna dinding, dan efisiensi lampu.
+                        </p>
+                        
+                        <div class="card-grid">
+                            <div class="card" onclick="switchSection('single-room')">
+                                <div class="card-title">
+                                    <div class="card-icon" style="background: var(--secondary);">
+                                        <i class="fas fa-calculator"></i>
+                                    </div>
+                                    <span>Hitung Satu Ruangan</span>
+                                </div>
+                                <div class="card-content">
+                                    Hitung kebutuhan penerangan untuk satu ruangan dengan spesifikasi lengkap termasuk dimensi, jenis ruangan, dan spesifikasi lampu.
+                                </div>
+                            </div>
+                            
+                            <div class="card" onclick="switchSection('multi-building')">
+                                <div class="card-title">
+                                    <div class="card-icon" style="background: var(--success);">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    <span>Hitung Seluruh Bangunan</span>
+                                </div>
+                                <div class="card-content">
+                                    Hitung kebutuhan penerangan untuk seluruh bangunan dengan beberapa lantai dan ruangan yang berbeda-beda spesifikasinya.
+                                </div>
+                            </div>
+                            
+                            <div class="card" onclick="switchSection('guide')">
+                                <div class="card-title">
+                                    <div class="card-icon" style="background: var(--warning);">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <span>Panduan Penggunaan</span>
+                                </div>
+                                <div class="card-content">
+                                    
+                                </div>Pelajari cara menggunakan aplikasi dan standar penerangan yang berlaku berdasarkan SNI.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Single Room Calculation -->
+                <div class="section" id="single-room">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 class="section-title" style="margin-bottom: 0; border: none; padding: 0;">
+                            <i class="fas fa-calculator"></i> Hitung Satu Ruangan
+                        </h2>
+                        <button class="btn btn-warning" onclick="switchSection('home')">
+                            <i class="fas fa-home"></i> Kembali ke Utama
+                        </button>
+                    </div>
+                    
+                    <!-- Single Room Form -->
+                    <div class="form-container">
+                        <h3 style="color: var(--primary); margin-bottom: 20px;">Data Ruangan</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Nama Ruangan</label>
+                            <input type="text" class="form-control" id="single-room-name" placeholder="Contoh: Ruang Tamu Utama" value="Ruang Tamu">
+                        </div>
+                        
+                        <div class="input-row">
+                            <div class="form-group">
+                                <label class="form-label">Panjang (m)</label>
+                                <input type="number" class="form-control" id="single-room-length" min="0.5" max="1000" step="0.1" value="5">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Lebar (m)</label>
+                                <input type="number" class="form-control" id="single-room-width" min="0.5" max="1000" step="0.1" value="4">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tinggi Plafon (m)</label>
+                                <input type="number" class="form-control" id="single-room-height" min="2" max="50" step="0.1" value="3">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Jenis Ruangan</label>
+                            <select class="form-control" id="single-room-type">
+                                <option value="0">Ruang Tamu (150-300 lux)</option>
+                                <option value="1">Kamar Tidur (100-200 lux)</option>
+                                <option value="2">Dapur (300-500 lux)</option>
+                                <option value="3">Kantor/Study (500-750 lux)</option>
+                                <option value="4">Kamar Mandi (200-300 lux)</option>
+                                <option value="5">Ruang Baca (500-1000 lux)</option>
+                                <option value="6">Koridor/Hall (100-150 lux)</option>
+                                <option value="7">Toko/Retail (750-1500 lux)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Warna Dinding</label>
+                            <select class="form-control" id="single-wall-color">
+                                <option value="0">Putih (Reflektansi 80%)</option>
+                                <option value="1">Terang (Reflektansi 60%)</option>
+                                <option value="2">Sedang (Reflektansi 40%)</option>
+                                <option value="3">Gelap (Reflektansi 20%)</option>
+                                <option value="4">Hitam (Reflektansi 10%)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Jenis Lampu</label>
+                            <select class="form-control" id="single-lamp-type">
+                                <option value="0">LED Ekonomi (80 lm/W, Faktor Daya 0.6)</option>
+                                <option value="1" selected>LED Standar (100 lm/W, Faktor Daya 0.85)</option>
+                                <option value="2">LED Premium (130 lm/W, Faktor Daya 0.95)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-row">
+                            <div class="form-group">
+                                <label class="form-label">Jam Penggunaan per Hari</label>
+                                <input type="number" class="form-control" id="single-hours-per-day" min="0" max="24" step="0.5" value="8">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tarif Listrik (Rp/kWh)</label>
+                                <select class="form-control" id="single-electricity-rate">
+                                    <option value="415">450 VA bersubsidi: Rp 415/kWh</option>
+                                    <option value="605">900 VA bersubsidi: Rp 605/kWh</option>
+                                    <option value="1352" selected>900 VA RTM: Rp 1.352/kWh</option>
+                                    <option value="1444.70">1.300-2.200 VA: Rp 1.444,70/kWh</option>
+                                    <option value="1699.53">3.500-5.500 VA: Rp 1.699,53/kWh</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="button-group">
+                            <button class="btn btn-success" onclick="calculateSingleRoom()" style="flex: 1;">
+                                <i class="fas fa-calculator"></i> Hitung
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Single Room Results -->
+                    <div id="single-room-results" style="display: none;">
+                        <div class="form-container">
+                            <h3 style="color: var(--primary); margin-bottom: 20px;">
+                                <i class="fas fa-chart-bar"></i> Hasil Perhitungan: 
+                                <span id="single-result-room-name" style="color: var(--secondary);">Ruang Tamu</span>
+                            </h3>
+                            
+                            <div class="results-container">
+                                <div class="result-card">
+                                    <div class="result-title"><i class="fas fa-ruler-combined"></i> Luas Ruangan</div>
+                                    <div class="result-value" id="single-result-area">20.00</div>
+                                    <div class="result-unit">m²</div>
+                                </div>
+                                
+                                <div class="result-card">
+                                    <div class="result-title"><i class="fas fa-tachometer-alt"></i> Kebutuhan Lux</div>
+                                    <div class="result-value" id="single-result-lux">225</div>
+                                    <div class="result-unit">lux (Rata-rata)</div>
+                                </div>
+                                
+                                <div class="result-card highlight">
+                                    <div class="result-title"><i class="fas fa-plug"></i> Total Daya</div>
+                                    <div class="result-value" id="single-result-watt">180</div>
+                                    <div class="result-unit">Watt</div>
+                                </div>
+                                
+                                <div class="result-card highlight">
+                                    <div class="result-title"><i class="fas fa-lightbulb"></i> Jumlah Lampu</div>
+                                    <div class="result-value" id="single-result-lamps">12</div>
+                                    <div class="result-unit">Buah</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 30px;">
+                                <h4 style="color: var(--primary); margin-bottom: 15px;">
+                                    <i class="fas fa-bolt"></i> Analisis Konsumsi Energi
+                                </h4>
+                                <div class="results-container">
+                                    <div class="result-card">
+                                        <div class="result-title"><i class="fas fa-calendar-day"></i> Konsumsi Bulanan</div>
+                                        <div class="result-value" id="single-result-monthly-kwh">43.20</div>
+                                        <div class="result-unit">kWh</div>
+                                    </div>
+                                    
+                                    <div class="result-card">
+                                        <div class="result-title"><i class="fas fa-money-bill"></i> Biaya Bulanan</div>
+                                        <div class="result-value" id="single-result-monthly-cost">58,406</div>
+                                        <div class="result-unit">Rupiah</div>
+                                    </div>
+                                    
+                                    <div class="result-card">
+                                        <div class="result-title"><i class="fas fa-calendar-alt"></i> Konsumsi Tahunan</div>
+                                        <div class="result-value" id="single-result-yearly-kwh">518.40</div>
+                                        <div class="result-unit">kWh</div>
+                                    </div>
+                                    
+                                    <div class="result-card">
+                                        <div class="result-title"><i class="fas fa-wallet"></i> Biaya Tahunan</div>
+                                        <div class="result-value" id="single-result-yearly-cost">700,877</div>
+                                        <div class="result-unit">Rupiah</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tips-container" style="margin-top: 25px;">
+                                <h4 class="tips-title"><i class="fas fa-lightbulb"></i> Rekomendasi Teknis</h4>
+                                <div class="tip-item">
+                                    <i class="fas fa-check-circle tip-icon"></i>
+                                    <span><strong>Tinggi Pemasangan Lampu:</strong> <span id="single-result-mount-height">2.2</span> meter dari lantai</span>
+                                </div>
+                                <div class="tip-item">
+                                    <i class="fas fa-check-circle tip-icon"></i>
+                                    <span><strong>Jarak Antar Lampu:</strong> <span id="single-result-lamp-distance">3.3</span> meter</span>
+                                </div>
+                                <div class="tip-item">
+                                    <i class="fas fa-check-circle tip-icon"></i>
+                                    <span><strong>Jarak ke Dinding:</strong> <span id="single-result-wall-distance">1.65</span> meter</span>
+                                </div>
+                            </div>
+                            
+                            <div class="button-group" style="margin-top: 30px;">
+                                <button class="btn btn-warning" onclick="resetSingleRoom()" style="flex: 1;">
+                                    <i class="fas fa-redo"></i> Hitung Lagi
+                                </button>
+                                <button class="btn btn-success" onclick="saveSingleReport()" style="flex: 1;">
+                                    <i class="fas fa-download"></i> Simpan Laporan
+                                </button>
+                                <button class="btn btn-primary" onclick="switchSection('home')" style="flex: 1;">
+                                    <i class="fas fa-home"></i> Kembali ke Utama
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Multi Building Calculation -->
+                <div class="section" id="multi-building">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 class="section-title" style="margin-bottom: 0; border: none; padding: 0;">
+                            <i class="fas fa-building"></i> Hitung Seluruh Bangunan
+                        </h2>
+                        <button class="btn btn-warning" onclick="switchSection('home')">
+                            <i class="fas fa-home"></i> Kembali ke Utama
+                        </button>
+                    </div>
+                    
+                    <!-- Progress Steps -->
+                    <div class="progress-steps">
+                        <div class="step active" id="building-step-1">
+                            <div class="step-number">1</div>
+                            <div class="step-label">Data Bangunan</div>
+                        </div>
+                        <div class="step" id="building-step-2">
+                            <div class="step-number">2</div>
+                            <div class="step-label">Konfigurasi Ruangan</div>
+                        </div>
+                        <div class="step" id="building-step-3">
+                            <div class="step-number">3</div>
+                            <div class="step-label">Hasil Perhitungan</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 1: Building Data -->
+                    <div class="form-container" id="building-data-step">
+                        <h3 style="color: var(--primary); margin-bottom: 20px;">
+                            <i class="fas fa-building"></i> Data Bangunan
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Nama Bangunan</label>
+                            <input type="text" class="form-control" id="building-name" placeholder="Contoh: Rumah Tinggal 2 Lantai" value="Rumah Tinggal">
+                        </div>
+                        
+                        <div class="input-row">
+                            <div class="form-group">
+                                <label class="form-label">Jumlah Lantai</label>
+                                <input type="number" class="form-control" id="building-floors" min="1" max="20" value="2">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tarif Listrik (Rp/kWh)</label>
+                                <select class="form-control" id="building-electricity-rate">
+                                    <option value="415">450 VA bersubsidi: Rp 415/kWh</option>
+                                    <option value="605">900 VA bersubsidi: Rp 605/kWh</option>
+                                    <option value="1352" selected>900 VA RTM: Rp 1.352/kWh</option>
+                                    <option value="1444.70">1.300-2.200 VA: Rp 1.444,70/kWh</option>
+                                    <option value="1699.53">3.500-5.500 VA: Rp 1.699,53/kWh</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Rata-rata Jam Penggunaan per Hari</label>
+                            <input type="number" class="form-control" id="building-hours-per-day" min="0" max="24" step="0.5" value="8">
+                        </div>
+                        
+                        <div class="button-group">
+                            <button class="btn btn-primary" onclick="nextBuildingStep(2)" style="flex: 1;">
+                                Lanjut <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Room Configuration -->
+                    <div class="form-container" id="room-config-step" style="display: none;">
+                        <h3 style="color: var(--primary); margin-bottom: 20px;">
+                            <i class="fas fa-door-open"></i> Konfigurasi Ruangan
+                        </h3>
+                        
+                        <div id="floors-container">
+                            <!-- Floors will be generated here -->
+                        </div>
+                        
+                        <div class="button-group">
+                            <button class="btn btn-warning" onclick="prevBuildingStep(1)" style="flex: 1;">
+                                <i class="fas fa-arrow-left"></i> Kembali
+                            </button>
+                            <button class="btn btn-success" onclick="calculateBuilding()" style="flex: 1;">
+                                <i class="fas fa-calculator"></i> Hitung Bangunan
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Building Results -->
+                    <div class="form-container" id="building-results-step" style="display: none;">
+                        <h3 style="color: var(--primary); margin-bottom: 20px;">
+                            <i class="fas fa-chart-bar"></i> Hasil Perhitungan Bangunan
+                        </h3>
+                        
+                        <h4 id="building-result-name" style="color: var(--secondary); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--light);">
+                            Rumah Tinggal
+                        </h4>
+                        
+                        <!-- Summary Results -->
+                        <div class="results-container">
+                            <div class="result-card highlight">
+                                <div class="result-title"><i class="fas fa-ruler-combined"></i> Total Luas</div>
+                                <div class="result-value" id="building-total-area">0</div>
+                                <div class="result-unit">m²</div>
+                            </div>
+                            
+                            <div class="result-card highlight">
+                                <div class="result-title"><i class="fas fa-plug"></i> Total Daya</div>
+                                <div class="result-value" id="building-total-watt">0</div>
+                                <div class="result-unit">Watt</div>
+                            </div>
+                            
+                            <div class="result-card">
+                                <div class="result-title"><i class="fas fa-lightbulb"></i> Total Lampu</div>
+                                <div class="result-value" id="building-total-lamps">0</div>
+                                <div class="result-unit">Buah</div>
+                            </div>
+                            
+                            <div class="result-card">
+                                <div class="result-title"><i class="fas fa-money-bill"></i> Biaya Bulanan</div>
+                                <div class="result-value" id="building-monthly-cost">0</div>
+                                <div class="result-unit">Rupiah</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Room Details Table -->
+                        <div style="margin-top: 30px;">
+                            <h4 style="color: var(--primary); margin-bottom: 15px;">
+                                <i class="fas fa-list"></i> Rincian per Ruangan
+                            </h4>
+                            
+                            <div id="room-details-container">
+                                <!-- Room details will be generated here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Tips and Recommendations -->
+                        <div class="tips-container" style="margin-top: 25px;">
+                            <h4 class="tips-title"><i class="fas fa-lightbulb"></i> Rekomendasi Instalasi</h4>
+                            <div class="tip-item">
+                                <i class="fas fa-bolt tip-icon"></i>
+                                <span><strong>Total Daya:</strong> <span id="building-total-power-display">0</span> Watt</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-plug tip-icon"></i>
+                                <span><strong>Total Arus (asumsi 220V):</strong> <span id="building-total-current">0</span> A</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-tools tip-icon"></i>
+                                <span><strong>Rekomendasi MCB:</strong> <span id="building-mcb-recommendation">-</span></span>
+                            </div>
+                        </div>
+                        
+                        <div class="button-group" style="margin-top: 30px;">
+                            <button class="btn btn-warning" onclick="prevBuildingStep(2)" style="flex: 1;">
+                                <i class="fas fa-arrow-left"></i> Kembali
+                            </button>
+                            <button class="btn btn-success" onclick="saveBuildingReport()" style="flex: 1;">
+                                <i class="fas fa-download"></i> Simpan Laporan
+                            </button>
+                            <button class="btn btn-primary" onclick="resetBuilding()" style="flex: 1;">
+                                <i class="fas fa-redo"></i> Hitung Lagi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guide Section -->
+                <div class="section" id="guide">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 class="section-title" style="margin-bottom: 0; border: none; padding: 0;">
+                            <i class="fas fa-book"></i> Panduan Penggunaan
+                        </h2>
+                        <button class="btn btn-warning" onclick="switchSection('home')">
+                            <i class="fas fa-home"></i> Kembali ke Utama
+                        </button>
+                    </div>
+                    
+                    <div class="form-container">
+                        <h3 style="color: var(--primary); margin-bottom: 15px;">Tentang Program</h3>
+                        <p style="margin-bottom: 20px; line-height: 1.6;">
+                            Program ini membantu Anda menghitung kebutuhan penerangan ruangan dan bangunan berdasarkan standar SNI 03-6577-2001. 
+                            Aplikasi ini memperhitungkan berbagai faktor seperti dimensi ruangan, jenis aktivitas, warna dinding, 
+                            dan spesifikasi lampu untuk memberikan rekomendasi yang akurat.
+                        </p>
+                        
+                        <h3 style="color: var(--primary); margin-bottom: 15px; margin-top: 25px;">Langkah-langkah Perhitungan</h3>
+                        
+                        <div class="tip-item" style="margin-bottom: 15px;">
+                            <div style="width: 30px; height: 30px; background: var(--secondary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px; flex-shrink: 0;">
+                                1
+                            </div>
+                            <div>
+                                <strong>Input Data Ruangan</strong> - Masukkan dimensi ruangan (panjang, lebar, tinggi), pilih jenis ruangan sesuai fungsi, pilih warna dinding berdasarkan reflektansi.
+                            </div>
+                        </div>
+                        
+                        <div class="tip-item" style="margin-bottom: 15px;">
+                            <div style="width: 30px; height: 30px; background: var(--success); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px; flex-shrink: 0;">
+                                2
+                            </div>
+                            <div>
+                                <strong>Spesifikasi Lampu</strong> - Pilih jenis lampu (LED Ekonomi/Standar/Premium) dan masukkan spesifikasi teknis lampu.
+                            </div>
+                        </div>
+                        
+                        <div class="tip-item" style="margin-bottom: 15px;">
+                            <div style="width: 30px; height: 30px; background: var(--warning); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px; flex-shrink: 0;">
+                                3
+                            </div>
+                            <div>
+                                <strong>Data Penggunaan</strong> - Masukkan pola penggunaan harian/bulanan dan tarif listrik.
+                            </div>
+                        </div>
+                        
+                        <div class="tip-item" style="margin-bottom: 15px;">
+                            <div style="width: 30px; height: 30px; background: var(--magenta); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px; flex-shrink: 0;">
+                                4
+                            </div>
+                            <div>
+                                <strong>Hasil & Analisis</strong> - Dapatkan rekomendasi jumlah lampu, analisis biaya operasional, dan rekomendasi penempatan.
+                            </div>
+                        </div>
+                        
+                        <h3 style="color: var(--primary); margin-bottom: 15px; margin-top: 25px;">Standar Lux yang Dianjurkan</h3>
+                        <p>Berdasarkan SNI 03-6577-2001:</p>
+                        
+                        <table class="result-table">
+                            <tr>
+                                <th>Jenis Ruangan</th>
+                                <th>Rentang Lux</th>
+                                <th>Rata-rata</th>
+                            </tr>
+                            <tr>
+                                <td>Ruang Tamu</td>
+                                <td>150-300 lux</td>
+                                <td>225 lux</td>
+                            </tr>
+                            <tr>
+                                <td>Kamar Tidur</td>
+                                <td>100-200 lux</td>
+                                <td>150 lux</td>
+                            </tr>
+                            <tr>
+                                <td>Dapur</td>
+                                <td>300-500 lux</td>
+                                <td>400 lux</td>
+                            </tr>
+                            <tr>
+                                <td>Kantor/Study</td>
+                                <td>500-750 lux</td>
+                                <td>625 lux</td>
+                            </tr>
+                            <tr>
+                                <td>Kamar Mandi</td>
+                                <td>200-300 lux</td>
+                                <td>250 lux</td>
+                            </tr>
+                            <tr>
+                                <td>Ruang Baca</td>
+                                <td>500-1000 lux</td>
+                                <td>750 lux</td>
+                            </tr>
+                            <tr>
+                                <td>Koridor/Hall</td>
+                                <td>100-150 lux</td>
+                                <td>125 lux</td>
+                            </tr>
+                            <tr>
+                                <td>Toko/Retail</td>
+                                <td>750-1500 lux</td>
+                                <td>1125 lux</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Adding/Editing Room -->
+        <div class="modal" id="room-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modal-title">Tambah Ruangan</h3>
+                    <button class="close-modal" onclick="closeRoomModal()">&times;</button>
+                </div>
+                <div id="modal-form-container">
+                    <!-- Form will be generated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>&copy; 2025 Kalkulator Penerangan Bangunan - Kelompok 6</p>
+            <p>Dikembangkan untuk memenuhi tugas mata kuliah Algoritma dan Pemrograman</p>
+            <p style="font-size: 0.9rem; margin-top: 10px;">
+                <i class="fas fa-lightbulb"></i> Berdasarkan Standar SNI 03-6577-2001 tentang Tata Cara Perancangan Sistem Pencahayaan Buatan
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Data untuk aplikasi
+        const roomTypes = [
+            { name: "Ruang Tamu", luxMin: 150, luxMax: 300, icon: "fa-couch" },
+            { name: "Kamar Tidur", luxMin: 100, luxMax: 200, icon: "fa-bed" },
+            { name: "Dapur", luxMin: 300, luxMax: 500, icon: "fa-utensils" },
+            { name: "Kantor/Study", luxMin: 500, luxMax: 750, icon: "fa-briefcase" },
+            { name: "Kamar Mandi", luxMin: 200, luxMax: 300, icon: "fa-bath" },
+            { name: "Ruang Baca", luxMin: 500, luxMax: 1000, icon: "fa-book-reader" },
+            { name: "Koridor/Hall", luxMin: 100, luxMax: 150, icon: "fa-walking" },
+            { name: "Toko/Retail", luxMin: 750, luxMax: 1500, icon: "fa-store" }
+        ];
+
+        const wallColors = [
+            { name: "Putih", reflectance: 0.8 },
+            { name: "Terang", reflectance: 0.6 },
+            { name: "Sedang", reflectance: 0.4 },
+            { name: "Gelap", reflectance: 0.2 },
+            { name: "Hitam", reflectance: 0.1 }
+        ];
+
+        const lampTypes = [
+            { name: "LED Ekonomi", efficacy: 80, powerFactor: 0.6, color: "#e74c3c" },
+            { name: "LED Standar", efficacy: 100, powerFactor: 0.85, color: "#3498db" },
+            { name: "LED Premium", efficacy: 130, powerFactor: 0.95, color: "#2ecc71" }
+        ];
+
+        // Data untuk bangunan
+        let buildingData = {
+            name: "Rumah Tinggal",
+            floors: 2,
+            electricityRate: 1352,
+            hoursPerDay: 8,
+            rooms: []
+        };
+
+        // Data sementara untuk modal
+        let currentModalFloor = 1;
+        let currentEditRoomId = null;
+
+        // Fungsi untuk berpindah section
+        function switchSection(sectionId) {
+            // Sembunyikan semua section
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Tampilkan section yang dipilih
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // Update menu aktif
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-target') === sectionId) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Scroll ke atas
+            document.querySelector('.content-area').scrollTop = 0;
+            
+            // Jika pindah ke multi-building, inisialisasi
+            if (sectionId === 'multi-building') {
+                initializeBuildingForm();
+            }
+        }
+
+        // ================================
+        // FUNGSI UNTUK SATU RUANGAN
+        // ================================
+
+        function calculateSingleRoom() {
+            // Ambil data dari form
+            const name = document.getElementById('single-room-name').value;
+            const length = parseFloat(document.getElementById('single-room-length').value);
+            const width = parseFloat(document.getElementById('single-room-width').value);
+            const height = parseFloat(document.getElementById('single-room-height').value);
+            const roomTypeIndex = parseInt(document.getElementById('single-room-type').value);
+            const wallColorIndex = parseInt(document.getElementById('single-wall-color').value);
+            const lampTypeIndex = parseInt(document.getElementById('single-lamp-type').value);
+            const hoursPerDay = parseFloat(document.getElementById('single-hours-per-day').value);
+            const electricityRate = parseFloat(document.getElementById('single-electricity-rate').value);
+            
+            // Validasi input
+            if (!name || isNaN(length) || isNaN(width) || isNaN(height)) {
+                alert('Harap isi semua data dengan benar!');
+                return;
+            }
+            
+            // Dapatkan data dari array
+            const roomType = roomTypes[roomTypeIndex];
+            const wallColor = wallColors[wallColorIndex];
+            const lampType = lampTypes[lampTypeIndex];
+            
+            // Hitung hasil
+            const result = calculateRoomLighting({
+                name,
+                length,
+                width,
+                height,
+                roomType,
+                wallColor,
+                lampType,
+                hoursPerDay,
+                electricityRate
+            });
+            
+            // Tampilkan hasil
+            document.getElementById('single-result-room-name').textContent = name;
+            document.getElementById('single-result-area').textContent = result.area.toFixed(2);
+            document.getElementById('single-result-lux').textContent = Math.round(result.requiredLux);
+            document.getElementById('single-result-watt').textContent = Math.round(result.totalWatts);
+            document.getElementById('single-result-lamps').textContent = result.lampCount;
+            document.getElementById('single-result-monthly-kwh').textContent = result.monthlyKwh.toFixed(2);
+            document.getElementById('single-result-monthly-cost').textContent = Math.round(result.monthlyCost).toLocaleString();
+            document.getElementById('single-result-yearly-kwh').textContent = result.yearlyKwh.toFixed(2);
+            document.getElementById('single-result-yearly-cost').textContent = Math.round(result.yearlyCost).toLocaleString();
+            document.getElementById('single-result-mount-height').textContent = result.mountingHeight.toFixed(2);
+            document.getElementById('single-result-lamp-distance').textContent = result.lampDistance.toFixed(2);
+            document.getElementById('single-result-wall-distance').textContent = result.wallDistance.toFixed(2);
+            
+            // Simpan data untuk laporan
+            window.singleRoomResult = result;
+            
+            // Tampilkan hasil, sembunyikan form
+            document.getElementById('single-room-results').style.display = 'block';
+            document.querySelector('#single-room .form-container').style.display = 'none';
+            
+            // Scroll ke hasil
+            document.getElementById('single-room-results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetSingleRoom() {
+            // Tampilkan form, sembunyikan hasil
+            document.querySelector('#single-room .form-container').style.display = 'block';
+            document.getElementById('single-room-results').style.display = 'none';
+            
+            // Reset form values
+            document.getElementById('single-room-name').value = 'Ruang Tamu';
+            document.getElementById('single-room-length').value = '5';
+            document.getElementById('single-room-width').value = '4';
+            document.getElementById('single-room-height').value = '3';
+            document.getElementById('single-room-type').value = '0';
+            document.getElementById('single-wall-color').value = '0';
+            document.getElementById('single-lamp-type').value = '1';
+            document.getElementById('single-hours-per-day').value = '8';
+            document.getElementById('single-electricity-rate').value = '1352';
+        }
+
+        function saveSingleReport() {
+            if (!window.singleRoomResult) return;
+            
+            const result = window.singleRoomResult;
+            const date = new Date().toLocaleDateString('id-ID');
+            
+            // Buat konten laporan
+            let report = `LAPORAN PERHITUNGAN PENERANGAN RUANGAN\n`;
+            report += `========================================\n\n`;
+            report += `Nama Ruangan: ${result.name}\n`;
+            report += `Tanggal: ${date}\n\n`;
+            
+            report += `DATA RUANGAN:\n`;
+            report += `-------------\n`;
+            report += `Ukuran: ${result.length}m × ${result.width}m × ${result.height}m\n`;
+            report += `Luas: ${result.area.toFixed(2)} m²\n`;
+            report += `Jenis Ruangan: ${result.roomType.name}\n`;
+            report += `Warna Dinding: ${result.wallColor.name}\n`;
+            report += `Jenis Lampu: ${result.lampType.name}\n\n`;
+            
+            report += `HASIL PERHITUNGAN:\n`;
+            report += `-----------------\n`;
+            report += `Kebutuhan Lux: ${Math.round(result.requiredLux)} lux\n`;
+            report += `Total Daya: ${Math.round(result.totalWatts)} Watt\n`;
+            report += `Jumlah Lampu: ${result.lampCount} buah\n`;
+            report += `Konsumsi Bulanan: ${result.monthlyKwh.toFixed(2)} kWh\n`;
+            report += `Biaya Bulanan: Rp ${Math.round(result.monthlyCost).toLocaleString()}\n`;
+            report += `Konsumsi Tahunan: ${result.yearlyKwh.toFixed(2)} kWh\n`;
+            report += `Biaya Tahunan: Rp ${Math.round(result.yearlyCost).toLocaleString()}\n\n`;
+            
+            report += `REKOMENDASI TEKNIS:\n`;
+            report += `------------------\n`;
+            report += `Tinggi Pemasangan: ${result.mountingHeight.toFixed(2)} m\n`;
+            report += `Jarak Antar Lampu: ${result.lampDistance.toFixed(2)} m\n`;
+            report += `Jarak ke Dinding: ${result.wallDistance.toFixed(2)} m\n`;
+            
+            // Download file
+            downloadReport(report, `Laporan_Ruangan_${result.name.replace(/\s+/g, '_')}_${date.replace(/\//g, '-')}.txt`);
+        }
+
+        // ================================
+        // FUNGSI UNTUK BANGUNAN
+        // ================================
+
+        function initializeBuildingForm() {
+            // Reset building data
+            buildingData = {
+                name: document.getElementById('building-name').value,
+                floors: parseInt(document.getElementById('building-floors').value),
+                electricityRate: parseFloat(document.getElementById('building-electricity-rate').value),
+                hoursPerDay: parseFloat(document.getElementById('building-hours-per-day').value),
+                rooms: []
+            };
+            
+            // Generate floors
+            generateFloors();
+            
+            // Reset to step 1
+            showBuildingStep(1);
+        }
+
+        function generateFloors() {
+            const container = document.getElementById('floors-container');
+            container.innerHTML = '';
+            
+            for (let floor = 1; floor <= buildingData.floors; floor++) {
+                const floorContainer = document.createElement('div');
+                floorContainer.className = 'floor-container';
+                floorContainer.innerHTML = `
+                    <div class="floor-header">
+                        <div class="floor-title">
+                            <i class="fas fa-layer-group"></i> Lantai ${floor}
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="openRoomModal(${floor})">
+                            <i class="fas fa-plus"></i> Tambah Ruangan
+                        </button>
+                    </div>
+                    <div class="rooms-container" id="rooms-floor-${floor}">
+                        <!-- Ruangan akan ditambahkan di sini -->
+                    </div>
+                `;
+                container.appendChild(floorContainer);
+                
+                // Tambahkan ruangan default untuk contoh
+                if (floor === 1) {
+                    addDefaultRoom(floor, "Ruang Tamu", 5, 4, 3, 0, 0, 1);
+                    addDefaultRoom(floor, "Kamar Tidur Utama", 4, 3.5, 3, 1, 1, 1);
+                    addDefaultRoom(floor, "Dapur", 3, 3, 3, 2, 0, 0);
+                } else if (floor === 2) {
+                    addDefaultRoom(floor, "Kamar Tidur 2", 4, 3, 3, 1, 1, 1);
+                    addDefaultRoom(floor, "Kamar Mandi", 2.5, 2, 3, 4, 0, 1);
+                }
+            }
+        }
+
+        function addDefaultRoom(floor, name, length, width, height, roomType, wallColor, lampType) {
+            const room = {
+                id: Date.now() + Math.random(),
+                floor: floor,
+                name: name,
+                length: length,
+                width: width,
+                height: height,
+                roomType: roomType,
+                wallColor: wallColor,
+                lampType: lampType
+            };
+            
+            buildingData.rooms.push(room);
+            updateRoomDisplay(floor);
+        }
+
+        function openRoomModal(floor, roomId = null) {
+            currentModalFloor = floor;
+            currentEditRoomId = roomId;
+            
+            const modal = document.getElementById('room-modal');
+            const title = document.getElementById('modal-title');
+            const formContainer = document.getElementById('modal-form-container');
+            
+            // Set judul modal
+            title.textContent = roomId ? 'Edit Ruangan' : 'Tambah Ruangan';
+            
+            // Cari data ruangan jika edit
+            let roomData = null;
+            if (roomId) {
+                roomData = buildingData.rooms.find(r => r.id === roomId);
+            }
+            
+            // Buat form
+            formContainer.innerHTML = `
+                <div class="form-group">
+                    <label class="form-label">Nama Ruangan</label>
+                    <input type="text" class="form-control" id="modal-room-name" 
+                           value="${roomData ? roomData.name : 'Ruangan Baru'}" 
+                           placeholder="Contoh: Ruang Tamu">
+                </div>
+                
+                <div class="input-row">
+                    <div class="form-group">
+                        <label class="form-label">Panjang (m)</label>
+                        <input type="number" class="form-control" id="modal-room-length" 
+                               min="0.5" max="100" step="0.1" 
+                               value="${roomData ? roomData.length : 4}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Lebar (m)</label>
+                        <input type="number" class="form-control" id="modal-room-width" 
+                               min="0.5" max="100" step="0.1" 
+                               value="${roomData ? roomData.width : 3}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tinggi (m)</label>
+                        <input type="number" class="form-control" id="modal-room-height" 
+                               min="2" max="10" step="0.1" 
+                               value="${roomData ? roomData.height : 3}">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Jenis Ruangan</label>
+                    <select class="form-control" id="modal-room-type">
+                        ${roomTypes.map((type, index) => `
+                            <option value="${index}" ${roomData && roomData.roomType === index ? 'selected' : ''}>
+                                ${type.name} (${type.luxMin}-${type.luxMax} lux)
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Warna Dinding</label>
+                    <select class="form-control" id="modal-wall-color">
+                        ${wallColors.map((color, index) => `
+                            <option value="${index}" ${roomData && roomData.wallColor === index ? 'selected' : ''}>
+                                ${color.name} (Reflektansi ${color.reflectance * 100}%)
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Jenis Lampu</label>
+                    <select class="form-control" id="modal-lamp-type">
+                        ${lampTypes.map((lamp, index) => `
+                            <option value="${index}" ${roomData && roomData.lampType === index ? 'selected' : ''}>
+                                ${lamp.name} (${lamp.efficacy} lm/W)
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+                
+                <div class="button-group" style="margin-top: 30px;">
+                    <button class="btn btn-warning" onclick="closeRoomModal()" style="flex: 1;">
+                        Batal
+                    </button>
+                    <button class="btn btn-success" onclick="saveRoom()" style="flex: 1;">
+                        ${roomId ? 'Update' : 'Simpan'}
+                    </button>
+                </div>
+            `;
+            
+            // Tampilkan modal
+            modal.style.display = 'flex';
+        }
+
+        function closeRoomModal() {
+            document.getElementById('room-modal').style.display = 'none';
+            currentEditRoomId = null;
+        }
+
+        function saveRoom() {
+            // Ambil data dari form modal
+            const name = document.getElementById('modal-room-name').value;
+            const length = parseFloat(document.getElementById('modal-room-length').value);
+            const width = parseFloat(document.getElementById('modal-room-width').value);
+            const height = parseFloat(document.getElementById('modal-room-height').value);
+            const roomType = parseInt(document.getElementById('modal-room-type').value);
+            const wallColor = parseInt(document.getElementById('modal-wall-color').value);
+            const lampType = parseInt(document.getElementById('modal-lamp-type').value);
+            
+            // Validasi
+            if (!name || isNaN(length) || isNaN(width) || isNaN(height)) {
+                alert('Harap isi semua data dengan benar!');
+                return;
+            }
+            
+            if (currentEditRoomId) {
+                // Edit ruangan yang ada
+                const roomIndex = buildingData.rooms.findIndex(r => r.id === currentEditRoomId);
+                if (roomIndex !== -1) {
+                    buildingData.rooms[roomIndex] = {
+                        ...buildingData.rooms[roomIndex],
+                        name,
+                        length,
+                        width,
+                        height,
+                        roomType,
+                        wallColor,
+                        lampType
+                    };
+                }
+            } else {
+                // Tambah ruangan baru
+                const room = {
+                    id: Date.now() + Math.random(),
+                    floor: currentModalFloor,
+                    name,
+                    length,
+                    width,
+                    height,
+                    roomType,
+                    wallColor,
+                    lampType
+                };
+                
+                buildingData.rooms.push(room);
+            }
+            
+            // Update tampilan
+            updateRoomDisplay(currentModalFloor);
+            
+            // Tutup modal
+            closeRoomModal();
+        }
+
+        function updateRoomDisplay(floor) {
+            const container = document.getElementById(`rooms-floor-${floor}`);
+            if (!container) return;
+            
+            // Filter ruangan untuk lantai ini
+            const floorRooms = buildingData.rooms.filter(room => room.floor === floor);
+            
+            container.innerHTML = '';
+            
+            if (floorRooms.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--gray);">
+                        <i class="fas fa-door-closed" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Belum ada ruangan di lantai ini</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Tampilkan setiap ruangan
+            floorRooms.forEach(room => {
+                const roomType = roomTypes[room.roomType];
+                const wallColor = wallColors[room.wallColor];
+                const lampType = lampTypes[room.lampType];
+                
+                const roomCard = document.createElement('div');
+                roomCard.className = 'room-card';
+                roomCard.innerHTML = `
+                    <div class="room-header">
+                        <div class="room-title">${room.name}</div>
+                        <div class="room-actions">
+                            <button type="button" class="btn btn-warning" onclick="openRoomModal(${floor}, ${room.id})" style="padding: 5px 10px; font-size: 0.9rem;">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="deleteRoom(${room.id})" style="padding: 5px 10px; font-size: 0.9rem;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="room-details">
+                        <div class="room-detail-item">
+                            <div class="room-detail-label">Ukuran</div>
+                            <div class="room-detail-value">${room.length}m × ${room.width}m × ${room.height}m</div>
+                        </div>
+                        <div class="room-detail-item">
+                            <div class="room-detail-label">Jenis Ruangan</div>
+                            <div class="room-detail-value">${roomType.name}</div>
+                        </div>
+                        <div class="room-detail-item">
+                            <div class="room-detail-label">Warna Dinding</div>
+                            <div class="room-detail-value">${wallColor.name}</div>
+                        </div>
+                        <div class="room-detail-item">
+                            <div class="room-detail-label">Jenis Lampu</div>
+                            <div class="room-detail-value">${lampType.name}</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(roomCard);
+            });
+        }
+
+        function deleteRoom(roomId) {
+            if (!confirm('Apakah Anda yakin ingin menghapus ruangan ini?')) return;
+            
+            const roomIndex = buildingData.rooms.findIndex(r => r.id === roomId);
+            if (roomIndex === -1) return;
+            
+            const floor = buildingData.rooms[roomIndex].floor;
+            buildingData.rooms.splice(roomIndex, 1);
+            updateRoomDisplay(floor);
+        }
+
+        function showBuildingStep(step) {
+            // Sembunyikan semua step
+            document.getElementById('building-data-step').style.display = 'none';
+            document.getElementById('room-config-step').style.display = 'none';
+            document.getElementById('building-results-step').style.display = 'none';
+            
+            // Update progress steps
+            document.querySelectorAll('.step').forEach(s => {
+                s.classList.remove('active', 'completed');
+            });
+            
+            // Tampilkan step yang diminta
+            if (step === 1) {
+                document.getElementById('building-data-step').style.display = 'block';
+                document.getElementById('building-step-1').classList.add('active');
+            } else if (step === 2) {
+                document.getElementById('room-config-step').style.display = 'block';
+                document.getElementById('building-step-1').classList.add('completed');
+                document.getElementById('building-step-2').classList.add('active');
+            } else if (step === 3) {
+                document.getElementById('building-results-step').style.display = 'block';
+                document.getElementById('building-step-1').classList.add('completed');
+                document.getElementById('building-step-2').classList.add('completed');
+                document.getElementById('building-step-3').classList.add('active');
+            }
+        }
+
+        function nextBuildingStep(step) {
+            if (step === 2) {
+                // Simpan data dari step 1
+                buildingData.name = document.getElementById('building-name').value;
+                buildingData.floors = parseInt(document.getElementById('building-floors').value);
+                buildingData.electricityRate = parseFloat(document.getElementById('building-electricity-rate').value);
+                buildingData.hoursPerDay = parseFloat(document.getElementById('building-hours-per-day').value);
+                
+                // Generate floors
+                generateFloors();
+            }
+            
+            showBuildingStep(step);
+        }
+
+        function prevBuildingStep(step) {
+            showBuildingStep(step);
+        }
+
+        function calculateBuilding() {
+            // Validasi ada ruangan
+            if (buildingData.rooms.length === 0) {
+                alert('Harap tambahkan setidaknya satu ruangan!');
+                return;
+            }
+            
+            // Hitung untuk setiap ruangan
+            const roomResults = buildingData.rooms.map(room => {
+                const roomType = roomTypes[room.roomType];
+                const wallColor = wallColors[room.wallColor];
+                const lampType = lampTypes[room.lampType];
+                
+                const result = calculateRoomLighting({
+                    name: room.name,
+                    length: room.length,
+                    width: room.width,
+                    height: room.height,
+                    roomType,
+                    wallColor,
+                    lampType,
+                    hoursPerDay: buildingData.hoursPerDay,
+                    electricityRate: buildingData.electricityRate
+                });
+                
+                return {
+                    ...result,
+                    floor: room.floor
+                };
+            });
+            
+            // Hitung total
+            const totals = {
+                area: roomResults.reduce((sum, r) => sum + r.area, 0),
+                totalWatts: roomResults.reduce((sum, r) => sum + r.totalWatts, 0),
+                lampCount: roomResults.reduce((sum, r) => sum + r.lampCount, 0),
+                monthlyCost: roomResults.reduce((sum, r) => sum + r.monthlyCost, 0),
+                monthlyKwh: roomResults.reduce((sum, r) => sum + r.monthlyKwh, 0)
+            };
+            
+            // Tampilkan hasil summary
+            document.getElementById('building-result-name').textContent = buildingData.name;
+            document.getElementById('building-total-area').textContent = totals.area.toFixed(2);
+            document.getElementById('building-total-watt').textContent = Math.round(totals.totalWatts);
+            document.getElementById('building-total-lamps').textContent = totals.lampCount;
+            document.getElementById('building-monthly-cost').textContent = Math.round(totals.monthlyCost).toLocaleString();
+            document.getElementById('building-total-power-display').textContent = Math.round(totals.totalWatts);
+            
+            // Hitung arus total
+            const totalCurrent = totals.totalWatts / 220; // Asumsi 220V
+            document.getElementById('building-total-current').textContent = totalCurrent.toFixed(1);
+            
+            // Rekomendasi MCB
+            const mcbRecommendation = getMCBRecommendation(totalCurrent);
+            document.getElementById('building-mcb-recommendation').textContent = mcbRecommendation;
+            
+            // Tampilkan rincian per ruangan
+            displayRoomDetails(roomResults);
+            
+            // Simpan hasil untuk laporan
+            window.buildingResults = {
+                name: buildingData.name,
+                totals,
+                roomResults,
+                electricityRate: buildingData.electricityRate,
+                hoursPerDay: buildingData.hoursPerDay
+            };
+            
+            // Tampilkan step hasil
+            showBuildingStep(3);
+        }
+
+        function displayRoomDetails(roomResults) {
+            const container = document.getElementById('room-details-container');
+            container.innerHTML = '';
+            
+            // Kelompokkan berdasarkan lantai
+            const floors = [...new Set(roomResults.map(r => r.floor))].sort((a, b) => a - b);
+            
+            floors.forEach(floor => {
+                const floorRooms = roomResults.filter(r => r.floor === floor);
+                const floorTotal = {
+                    area: floorRooms.reduce((sum, r) => sum + r.area, 0),
+                    totalWatts: floorRooms.reduce((sum, r) => sum + r.totalWatts, 0),
+                    lampCount: floorRooms.reduce((sum, r) => sum + r.lampCount, 0),
+                    monthlyCost: floorRooms.reduce((sum, r) => sum + r.monthlyCost, 0)
+                };
+                
+                const floorSection = document.createElement('div');
+                floorSection.className = 'floor-container';
+                floorSection.innerHTML = `
+                    <div class="floor-header">
+                        <div class="floor-title">
+                            <i class="fas fa-layer-group"></i> Lantai ${floor}
+                        </div>
+                        <div style="color: var(--secondary); font-weight: 600;">
+                            Total: ${floorTotal.area.toFixed(2)} m², ${Math.round(floorTotal.totalWatts)}W, ${floorTotal.lampCount} lampu
+                        </div>
+                    </div>
+                    <table class="result-table">
+                        <thead>
+                            <tr>
+                                <th>Ruangan</th>
+                                <th>Luas (m²)</th>
+                                <th>Lux</th>
+                                <th>Daya (W)</th>
+                                <th>Lampu</th>
+                                <th>Biaya/Bulan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${floorRooms.map(room => `
+                                <tr>
+                                    <td>${room.name}</td>
+                                    <td>${room.area.toFixed(2)}</td>
+                                    <td>${Math.round(room.requiredLux)}</td>
+                                    <td>${Math.round(room.totalWatts)}</td>
+                                    <td>${room.lampCount}</td>
+                                    <td>Rp ${Math.round(room.monthlyCost).toLocaleString()}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                container.appendChild(floorSection);
+            });
+        }
+
+        function getMCBRecommendation(current) {
+            if (current <= 6) return "6A";
+            if (current <= 10) return "10A";
+            if (current <= 16) return "16A";
+            if (current <= 20) return "20A";
+            if (current <= 25) return "25A";
+            return ">25A (Perlu instalasi khusus)";
+        }
+
+        function saveBuildingReport() {
+            if (!window.buildingResults) return;
+            
+            const results = window.buildingResults;
+            const date = new Date().toLocaleDateString('id-ID');
+            
+            // Buat konten laporan
+            let report = `LAPORAN PERHITUNGAN PENERANGAN BANGUNAN\n`;
+            report += `===========================================\n\n`;
+            report += `Nama Bangunan: ${results.name}\n`;
+            report += `Tanggal: ${date}\n`;
+            report += `Tarif Listrik: Rp ${results.electricityRate}/kWh\n`;
+            report += `Jam Penggunaan per Hari: ${results.hoursPerDay} jam\n\n`;
+            
+            report += `HASIL PERHITUNGAN:\n`;
+            report += `-----------------\n`;
+            report += `Total Luas Bangunan: ${results.totals.area.toFixed(2)} m²\n`;
+            report += `Total Daya Penerangan: ${Math.round(results.totals.totalWatts)} Watt\n`;
+            report += `Total Jumlah Lampu: ${results.totals.lampCount} buah\n`;
+            report += `Total Konsumsi Bulanan: ${results.totals.monthlyKwh.toFixed(2)} kWh\n`;
+            report += `Total Biaya Bulanan: Rp ${Math.round(results.totals.monthlyCost).toLocaleString()}\n\n`;
+            
+            report += `RINCIAN PER RUANGAN:\n`;
+            report += `-------------------\n`;
+            
+            // Kelompokkan berdasarkan lantai
+            const floors = [...new Set(results.roomResults.map(r => r.floor))].sort((a, b) => a - b);
+            
+            floors.forEach(floor => {
+                report += `\nLantai ${floor}:\n`;
+                report += `--------------------------------------------------------------------\n`;
+                report += `No | Ruangan | Luas (m²) | Lux | Daya (W) | Lampu | Biaya/Bulan\n`;
+                report += `--------------------------------------------------------------------\n`;
+                
+                const floorRooms = results.roomResults.filter(r => r.floor === floor);
+                floorRooms.forEach((room, index) => {
+                    report += `${index + 1} | ${room.name} | ${room.area.toFixed(2)} | ${Math.round(room.requiredLux)} | ${Math.round(room.totalWatts)} | ${room.lampCount} | Rp ${Math.round(room.monthlyCost).toLocaleString()}\n`;
+                });
+            });
+            
+            // Download file
+            downloadReport(report, `Laporan_Bangunan_${results.name.replace(/\s+/g, '_')}_${date.replace(/\//g, '-')}.txt`);
+        }
+
+        function resetBuilding() {
+            // Reset data
+            buildingData = {
+                name: "Rumah Tinggal",
+                floors: 2,
+                electricityRate: 1352,
+                hoursPerDay: 8,
+                rooms: []
+            };
+            
+            // Reset form values
+            document.getElementById('building-name').value = 'Rumah Tinggal';
+            document.getElementById('building-floors').value = '2';
+            document.getElementById('building-electricity-rate').value = '1352';
+            document.getElementById('building-hours-per-day').value = '8';
+            
+            // Kembali ke step 1
+            showBuildingStep(1);
+        }
+
+        // ================================
+        // FUNGSI PERHITUNGAN UMUM
+        // ================================
+
+        function calculateRoomLighting(data) {
+            const { name, length, width, height, roomType, wallColor, lampType, hoursPerDay, electricityRate } = data;
+            
+            // Hitung luas
+            const area = length * width;
+            
+            // Hitung kebutuhan lux (rata-rata)
+            const requiredLux = (roomType.luxMin + roomType.luxMax) / 2;
+            
+            // Hitung indeks ruangan
+            const roomIndex = calculateRoomIndex(length, width, height);
+            
+            // Hitung faktor pemanfaatan
+            const utilizationFactor = calculateUtilizationFactor(roomIndex, wallColor.reflectance);
+            
+            // Asumsi faktor perawatan
+            const maintenanceFactor = 0.8;
+            
+            // Hitung total lumen yang dibutuhkan
+            const totalLumens = (requiredLux * area) / (utilizationFactor * maintenanceFactor);
+            
+            // Hitung total watt yang dibutuhkan
+            const totalWatts = totalLumens / lampType.efficacy;
+            
+            // Hitung jumlah lampu (asumsi 15W per lampu)
+            const wattPerLamp = 15;
+            const lampCount = Math.ceil(totalWatts / wattPerLamp);
+            const actualWatts = lampCount * wattPerLamp;
+            
+            // Hitung konsumsi energi
+            const hoursPerMonth = hoursPerDay * 30; // Asumsi 30 hari
+            const monthlyKwh = (actualWatts * hoursPerMonth) / 1000;
+            const monthlyCost = monthlyKwh * electricityRate;
+            const yearlyKwh = monthlyKwh * 12;
+            const yearlyCost = monthlyCost * 12;
+            
+            // Hitung rekomendasi teknis
+            const mountingHeight = height - 0.8;
+            const lampDistance = mountingHeight * 1.5;
+            const wallDistance = lampDistance / 2;
+            
+            return {
+                name,
+                length,
+                width,
+                height,
+                area,
+                requiredLux,
+                roomType,
+                wallColor,
+                lampType,
+                totalWatts: actualWatts,
+                lampCount,
+                monthlyKwh,
+                monthlyCost,
+                yearlyKwh,
+                yearlyCost,
+                mountingHeight,
+                lampDistance,
+                wallDistance
+            };
+        }
+
+        function calculateRoomIndex(length, width, height) {
+            return (length * width) / (height * (length + width));
+        }
+
+        function calculateUtilizationFactor(roomIndex, reflectance) {
+            let factor;
+            
+            if (roomIndex < 0.7) {
+                factor = 0.35 + 0.35 * reflectance;
+            } else if (roomIndex < 1.5) {
+                factor = 0.5 + 0.3 * reflectance;
+            } else {
+                factor = 0.6 + 0.4 * reflectance;
+            }
+            
+            // Batasi antara 0.3 dan 0.9
+            if (factor < 0.3) factor = 0.3;
+            if (factor > 0.9) factor = 0.9;
+            
+            return factor;
+        }
+
+        function downloadReport(content, filename) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            // Efek sukses
+            const button = event.target;
+            button.classList.add('success-pulse');
+            setTimeout(() => button.classList.remove('success-pulse'), 500);
+            
+            alert('Laporan berhasil disimpan!');
+        }
+
+        // ================================
+        // INISIALISASI
+        // ================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tambahkan event listener untuk menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const targetSection = this.getAttribute('data-target');
+                    if (targetSection) {
+                        switchSection(targetSection);
+                    }
+                });
+            });
+            
+            // Set default view
+            switchSection('home');
+        });
+    </script>
+</body>
+</html>
